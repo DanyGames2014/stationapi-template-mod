@@ -33,4 +33,8 @@ bin/
 run/*
 # Remove the following line to remove server.properties from your project.
 !server.properties
-!run/config/hmifabric/config.json
+
+# Keep HMI Fabric config
+!/run/config/
+/run/config/*
+!/run/config/hmifabric/
