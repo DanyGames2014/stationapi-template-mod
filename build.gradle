@@ -2,8 +2,8 @@
 //file:noinspection GroovyUnusedAssignment
 //file:noinspection ForeignDelegate
 plugins {
-    id 'fabric-loom' version '1.7.2'
-    id 'babric-loom-extension' version '1.7.4'
+    id 'fabric-loom' version '1.8.10'
+    id 'babric-loom-extension' version '1.8.6'
     id 'maven-publish'
 }
 
@@ -101,11 +101,15 @@ dependencies {
     }
 	
     modImplementation("com.github.matthewperiut:retrocommands:${project.retrocommands_version}") {
-	transitive false
+	    transitive false
     }
 
     modImplementation("net.danygames2014:spawneggs:${project.spawneggs_version}") {
-	transitive false
+        transitive false
+    }
+
+    modRuntimeOnly ("com.github.matthewperiut:stapi-fast-intro:17a7ed0") { 
+        transitive false 
     }
 }
 
