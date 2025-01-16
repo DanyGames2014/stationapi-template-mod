@@ -15,7 +15,7 @@ version = project.mod_version
 group = project.maven_group
 
 loom {
-
+	accessWidenerPath = file("src/main/resources/tropicraft.accesswidener")
 }
 
 repositories {
@@ -83,7 +83,6 @@ dependencies {
 
     modImplementation "net.modificationstation:StationAPI:${project.stapi_version}"
 
-    // Optional, but convenient mods for mod creators and users alike.
     modImplementation("net.glasslauncher.mods:ModMenu:${project.modmenu_version}") {
         transitive false
     }
@@ -108,10 +107,13 @@ dependencies {
         transitive false
     }
 
-// Not compatible with stapi alpha 3
-//    modRuntimeOnly ("com.github.matthewperiut:stapi-fast-intro:17a7ed0") { 
-//        transitive false 
-//    }
+    modRuntimeOnly("maven.modrinth:unitweaks:${project.unitweaks_version}-fabric,b1.7.3") {
+        transitive false
+    }
+
+    modRuntimeOnly("maven.modrinth:fast-stapi-intro:2.0.0-fabric,b1.7.3") {
+        transitive false
+    }
 }
 
 processResources {
@@ -136,24 +138,37 @@ jar {
     }
 }
 
-// configure the maven publication
+// Maven Publishing
 publishing {
-    repositories {
-        mavenLocal()
-        if (project.hasProperty("nyarepo_publishing_cave_username")) {
-            maven {
-                url = "https://maven.fildand.cz/releases"
-                credentials {
-                    username "${project.nyarepo_publishing_cave_username}"
-                    password "${project.nyarepo_publishing_cave_password}"
-                }
-            }
-        }
-    }
+	repositories {
+		mavenLocal()
 
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
+		// Glass Maven
+		if(project.hasProperty("calmilamsy_secret_publishing_cave_username")){
+			maven {
+				url = "https://maven.glass-launcher.net/releases"
+				credentials {
+					username "${project.calmilamsy_secret_publishing_cave_username}"
+					password "${project.calmilamsy_secret_publishing_cave_password}"
+				}
+			}
+		}
+
+		// NyaRepo
+		if(project.hasProperty("nyarepo_publishing_cave_username")){
+			maven {
+				url = "https://maven.fildand.cz/releases"
+				credentials {
+					username "${project.nyarepo_publishing_cave_username}"
+					password "${project.nyarepo_publishing_cave_password}"
+				}
+			}
+		}
+	}
+
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
 }
