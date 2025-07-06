@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'fabric-loom' version '1.10.5'
     id 'babric-loom-extension' version '1.10.1'
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -179,4 +180,21 @@ publishing {
 			from components.java
 		}
 	}
+}
+
+// Modrinth Publishing
+modrinth {
+    token = project.modrinth_publishing_cave
+    projectId = project.modrinth_slug
+    versionNumber = project.mod_version
+    versionName = "${project.modrinth_version_name} ${project.mod_version}"
+    changelog = rootProject.file("CHANGELOG.md").text
+    versionType = "release"
+    uploadFile = remapJar
+    gameVersions = ["b1.7.3"]
+    loaders = ["fabric", "babric"]
+    dependencies {
+        required.project "stationapi"
+        required.project "glass-config-api"
+    }
 }
