@@ -16,7 +16,7 @@ version = project.mod_version
 group = project.maven_group
 
 loom {
-	//accessWidenerPath = file("src/main/resources/template.accesswidener")
+    //accessWidenerPath = file("src/main/resources/template.accesswidener")
 }
 
 repositories {
@@ -90,7 +90,7 @@ dependencies {
     modImplementation("net.glasslauncher.mods:glass-networking:${project.glass_networking_version}") {
         transitive false
     }
-	
+
     modImplementation("net.glasslauncher.mods:GlassConfigAPI:${project.gcapi_version}") {
         transitive false
     }
@@ -98,9 +98,9 @@ dependencies {
     modImplementation("net.glasslauncher.mods:AlwaysMoreItems:${project.alwaysmoreitems_version}") {
         transitive false
     }
-	
+
     modImplementation("maven.modrinth:retrocommands:${project.retrocommands_version}-b1.7.3") {
-	    transitive false
+        transitive false
     }
 
     modImplementation("net.danygames2014:spawneggs:${project.spawneggs_version}") {
@@ -114,7 +114,7 @@ dependencies {
     modRuntimeOnly("maven.modrinth:retroauth:${project.retroauth_version}-b1.7.3") {
         transitive false
     }
-    
+
     modRuntimeOnly("maven.modrinth:unitweaks:${project.unitweaks_version}-b1.7.3") {
         transitive false
     }
@@ -148,38 +148,38 @@ jar {
 
 // Maven Publishing
 publishing {
-	repositories {
-		mavenLocal()
+    repositories {
+        mavenLocal()
 
-		// Glass Maven
-		if(project.hasProperty("calmilamsy_secret_publishing_cave_username")){
-			maven {
-				url = "https://maven.glass-launcher.net/releases"
-				credentials {
-					username "${project.calmilamsy_secret_publishing_cave_username}"
-					password "${project.calmilamsy_secret_publishing_cave_password}"
-				}
-			}
-		}
+        // Glass Maven
+        if (project.hasProperty("calmilamsy_secret_publishing_cave_username")) {
+            maven {
+                url = "https://maven.glass-launcher.net/releases"
+                credentials {
+                    username "${project.calmilamsy_secret_publishing_cave_username}"
+                    password "${project.calmilamsy_secret_publishing_cave_password}"
+                }
+            }
+        }
 
-		// NyaRepo
-		if(project.hasProperty("nyarepo_publishing_cave_username")){
-			maven {
-				url = "https://maven.fildand.cz/releases"
-				credentials {
-					username "${project.nyarepo_publishing_cave_username}"
-					password "${project.nyarepo_publishing_cave_password}"
-				}
-			}
-		}
-	}
+        // NyaRepo
+        if (project.hasProperty("nyarepo_publishing_cave_username")) {
+            maven {
+                url = "https://maven.fildand.cz/releases"
+                credentials {
+                    username "${project.nyarepo_publishing_cave_username}"
+                    password "${project.nyarepo_publishing_cave_password}"
+                }
+            }
+        }
+    }
 
-	publications {
-		mavenJava(MavenPublication) {
-			artifactId = project.archivesBaseName
-			from components.java
-		}
-	}
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.archivesBaseName
+            from components.java
+        }
+    }
 }
 
 // Modrinth Publishing
@@ -197,4 +197,66 @@ modrinth {
         required.project "stationapi"
         required.project "glass-config-api"
     }
+}
+
+tasks.register("update") {
+    doLast {
+        def propsFile = file("gradle.properties")
+        
+        List<String> lines = propsFile.readLines()
+
+        updateDependency(lines, "BINY", "yarn_mappings", "https://maven.glass-launcher.net/releases/net/glasslauncher/biny")
+        updateDependency(lines, "Fabric Loader", "loader_version", "https://maven.fabricmc.net/net/fabricmc/fabric-loader/")
+        updateDependency(lines, "StationAPI", "stapi_version", "https://maven.glass-launcher.net/releases/net/modificationstation/StationAPI")
+        updateDependency(lines, "Glass Networking", "glass_networking_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/glass-networking")
+        updateDependency(lines, "Glass Config API", "gcapi_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/GlassConfigAPI")
+        updateDependency(lines, "Always More Items", "alwaysmoreitems_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/AlwaysMoreItems")
+        updateDependency(lines, "ModMenu", "modmenu_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/ModMenu")
+        updateDependency(lines, "BH Creative", "bhcreative_version", "https://api.modrinth.com/maven/maven/modrinth/bh-creative")
+        updateDependency(lines, "Spawn Eggs", "spawneggs_version", "https://maven.glass-launcher.net/releases/net/danygames2014/spawneggs")
+        updateDependency(lines, "Retro Commands", "retrocommands_version", "https://api.modrinth.com/maven/maven/modrinth/retrocommands")
+        updateDependency(lines, "RetroAuth", "retroauth_version", "https://api.modrinth.com/maven/maven/modrinth/retroauth")
+        updateDependency(lines, "UniTweaks", "unitweaks_version", "https://api.modrinth.com/maven/maven/modrinth/unitweaks")
+        
+        propsFile.text = lines.join(System.lineSeparator())
+        println("Finished updating dependencies, please reload your Gradle Project")
+    }
+}
+
+def updateDependency(List<String> lines, String name, String property, String artifactUrl) {
+    println("Updating Dependency " + name)
+
+    if (!project.hasProperty(property)) {
+        println("Project does not have property " + property)
+    }
+
+    String latestVersion = fetchLatestVersion(artifactUrl)
+
+    if (latestVersion == null) {
+        println("Error while fetching latest version")
+    }
+
+    for (int i = 0; i < lines.size(); i++) {
+        if (lines[i].contains(property)){
+            lines[i] = lines[i].split("=")[0] + "=" + latestVersion
+            break
+        }
+    }
+    
+    println("Dependency " + name + " updated to " + latestVersion)
+}
+
+static def fetchLatestVersion(String artifactUrl) {
+    String latestVersion = null
+
+    try {
+        String artifactMeta = new URL(artifactUrl + "/maven-metadata.xml").text
+        latestVersion = artifactMeta.split("<latest>")[1].split("</latest>")[0]
+    } catch (Exception e) {
+        println("Error while updating dependency " + artifactUrl)
+        println(e.message)
+        return null
+    }
+
+    return latestVersion;
 }
