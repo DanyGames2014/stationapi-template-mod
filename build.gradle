@@ -63,6 +63,7 @@ repositories {
     // Modrinth Maven
     exclusiveContent {
         forRepository {
+            //noinspection ForeignDelegate
             maven {
                 name = "Modrinth"
                 url = "https://api.modrinth.com/maven"
@@ -264,7 +265,7 @@ def updateDependency(List<String> lines, String name, String property, String ar
 }
 
 static def fetchLatestVersion(String artifactUrl) {
-    String latestVersion = null
+    String latestVersion
 
     try {
         String artifactMeta = new URL(artifactUrl + "/maven-metadata.xml").text
@@ -275,5 +276,5 @@ static def fetchLatestVersion(String artifactUrl) {
         return null
     }
 
-    return latestVersion;
+    return latestVersion
 }
