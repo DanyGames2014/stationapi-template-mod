@@ -230,22 +230,31 @@ def updateDependency(List<String> lines, String name, String property, String ar
 
     if (!project.hasProperty(property)) {
         println("Project does not have property " + property)
+        return
     }
 
     String latestVersion = fetchLatestVersion(artifactUrl)
 
     if (latestVersion == null) {
         println("Error while fetching latest version")
+        return
     }
 
     for (int i = 0; i < lines.size(); i++) {
         if (lines[i].contains(property)){
-            lines[i] = lines[i].split("=")[0] + "=" + latestVersion
+            String[] split = lines[i].split("=")
+            String currentVersion = split[1]
+            
+            if (!currentVersion.equalsIgnoreCase(latestVersion)){
+                println("Dependency " + name + " updated. (" + currentVersion + " -> " + latestVersion + ")")
+                lines[i] = split[0] + "=" + latestVersion
+            } else {
+                println("Dependency " + name + " is already up to date. (" + currentVersion + ")")
+            }
+            
             break
         }
     }
-    
-    println("Dependency " + name + " updated to " + latestVersion)
 }
 
 static def fetchLatestVersion(String artifactUrl) {
