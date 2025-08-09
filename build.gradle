@@ -1,6 +1,4 @@
-//file:noinspection GroovyAssignabilityCheck
-//file:noinspection GroovyUnusedAssignment
-//file:noinspection ForeignDelegate
+
 plugins {
     id 'maven-publish'
     id 'fabric-loom' version '1.10.5'
@@ -8,12 +6,18 @@ plugins {
     id "com.modrinth.minotaur" version "2.+"
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+version = property("mod_version")
+group = property("maven_group")
 
-archivesBaseName = project.archives_base_name
-version = project.mod_version
-group = project.maven_group
+base {
+    archivesName = project.archives_base_name
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 loom {
     //accessWidenerPath = file("src/main/resources/template.accesswidener")
@@ -144,7 +148,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_" + base.archivesName.get() }
     }
 }
 
@@ -177,8 +181,10 @@ publishing {
     }
 
     publications {
-        mavenJava(MavenPublication) {
-            artifactId = project.archivesBaseName
+        create("mavenJava", MavenPublication) {
+            //noinspection GrUnresolvedAccess
+            artifactId = base.archivesName.get()
+            //noinspection GrUnresolvedAccess, GroovyAssignabilityCheck
             from components.java
         }
     }
