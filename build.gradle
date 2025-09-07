@@ -136,6 +136,12 @@ dependencies {
         }
     }
 
+    if (project.hasProperty("accessoryapi_version")) {
+        modImplementation("maven.modrinth:accessory-api:${project.accessoryapi_version}") {
+            transitive false
+        }
+    }
+
     if (project.hasProperty("whatsthis_version")) {
         modImplementation("net.danygames2014:WhatsThis:${project.whatsthis_version}") {
             transitive = false
@@ -278,6 +284,7 @@ tasks.register("update") {
         updateDependency(lines, "BH Creative", "bhcreative_version", "https://api.modrinth.com/maven/maven/modrinth/bh-creative")
         updateDependency(lines, "Spawn Eggs", "spawneggs_version", "https://maven.glass-launcher.net/releases/net/danygames2014/spawneggs")
         updateDependency(lines, "Retro Commands", "retrocommands_version", "https://api.modrinth.com/maven/maven/modrinth/retrocommands")
+        updateDependency(lines, "Accessory API", "accessoryapi_version", "https://api.modrinth.com/maven/maven/modrinth/accessory-api")
         updateDependency(lines, "RetroAuth", "retroauth_version", "https://api.modrinth.com/maven/maven/modrinth/retroauth")
         updateDependency(lines, "UniTweaks", "unitweaks_version", "https://api.modrinth.com/maven/maven/modrinth/unitweaks")
         updateDependency(lines, "Whats This", "whatsthis_version", "https://maven.fildand.cz/releases/net/danygames2014/WhatsThis")
