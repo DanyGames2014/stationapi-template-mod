@@ -19,7 +19,12 @@ java {
 }
 
 loom {
-    //accessWidenerPath = file("src/main/resources/template.accesswidener")
+    if (project.hasProperty("accesswidener_name") && project.accesswidener_name.length() > 0) {
+        accessWidenerPath = file("src/main/resources/${project.accesswidener_name}.accesswidener")
+    }
+    mixin {
+        useLegacyMixinAp = false
+    }
 }
 
 repositories {
@@ -85,60 +90,80 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-slf4j18-impl:2.17.2"
     implementation "me.carleslc:Simple-Yaml:1.8.4"
 
-    modImplementation ("net.modificationstation:StationAPI:${project.stapi_version}") {
+    modImplementation("net.modificationstation:StationAPI:${project.stapi_version}") {
         exclude group: "babric", module: "fabric-loader"
     }
 
-    modImplementation("net.glasslauncher.mods:ModMenu:${project.modmenu_version}") {
-        transitive false
+    if (project.hasProperty("modmenu_version")) {
+        modImplementation("net.glasslauncher.mods:ModMenu:${project.modmenu_version}") {
+            transitive false
+        }
     }
 
-    modImplementation("net.glasslauncher.mods:glass-networking:${project.glass_networking_version}") {
-        transitive false
+    if (project.hasProperty("glass_networking_version")) {
+        modImplementation("net.glasslauncher.mods:glass-networking:${project.glass_networking_version}") {
+            transitive false
+        }
     }
 
-    modImplementation("net.glasslauncher.mods:GlassConfigAPI:${project.gcapi_version}") {
-        transitive false
+    if (project.hasProperty("gcapi_version")) {
+        modImplementation("net.glasslauncher.mods:GlassConfigAPI:${project.gcapi_version}") {
+            transitive false
+        }
     }
 
-    modImplementation("net.glasslauncher.mods:AlwaysMoreItems:${project.alwaysmoreitems_version}") {
-        transitive false
+    if (project.hasProperty("alwaysmoreitems_version")) {
+        modImplementation("net.glasslauncher.mods:AlwaysMoreItems:${project.alwaysmoreitems_version}") {
+            transitive false
+        }
     }
 
-    modImplementation("maven.modrinth:retrocommands:${project.retrocommands_version}-b1.7.3") {
-        transitive false
+    if (project.hasProperty("retrocommands_version")) {
+        modImplementation("maven.modrinth:retrocommands:${project.retrocommands_version}-b1.7.3") {
+            transitive false
+        }
     }
 
-    modImplementation("net.danygames2014:spawneggs:${project.spawneggs_version}") {
-        transitive false
+    if (project.hasProperty("spawneggs_version")) {
+        modImplementation("net.danygames2014:spawneggs:${project.spawneggs_version}") {
+            transitive false
+        }
     }
 
-    modImplementation("maven.modrinth:bh-creative:${project.bhcreative_version}-b1.7.3") {
-        transitive false
+    if (project.hasProperty("bhcreative_version")) {
+        modImplementation("maven.modrinth:bh-creative:${project.bhcreative_version}-b1.7.3") {
+            transitive false
+        }
     }
 
-    modRuntimeOnly("maven.modrinth:retroauth:${project.retroauth_version}-b1.7.3") {
-        transitive false
+    if (project.hasProperty("whatsthis_version")) {
+        modImplementation("net.danygames2014:WhatsThis:${project.whatsthis_version}") {
+            transitive false
+        }
     }
 
-    modRuntimeOnly("maven.modrinth:unitweaks:${project.unitweaks_version}-b1.7.3") {
-        transitive false
-    }
-
-    modImplementation("net.danygames2014:WhatsThis:${project.whatsthis_version}") {
-        transitive false
-    }
-    
     if (project.hasProperty("nyalib_version")) {
         modImplementation("net.danygames2014:NyaLib:${project.nyalib_version}")
     }
-    
+
     if (project.hasProperty("uniwrench_version")) {
         modImplementation("net.danygames2014:UniWrench:${project.uniwrench_version}") {
             transitive false
         }
     }
-    
+
+    if (project.hasProperty("retroauth_version")) {
+        modRuntimeOnly("maven.modrinth:retroauth:${project.retroauth_version}-b1.7.3") {
+            transitive false
+        }
+    }
+
+    if (project.hasProperty("unitweaks_version")) {
+        modRuntimeOnly("maven.modrinth:unitweaks:${project.unitweaks_version}-b1.7.3") {
+            transitive false
+        }
+    }
+
     modRuntimeOnly("maven.modrinth:fast-stapi-intro:2.0.0-b1.7.3") {
         transitive false
     }
@@ -221,10 +246,21 @@ modrinth {
     }
 }
 
+tasks.named("modrinth") {
+    onlyIf {
+        if (!project.hasProperty("modrinth_publishing_cave") || !project.hasProperty("modrinth_slug") || project.modrinth_slug.length() == 0 || !project.hasProperty("modrinth_version_name") || project.modrinth_version_name.length() == 0) {
+            println("Modrinth publishing skipped due to the required properties not being set")
+            return false
+        }
+
+        return true
+    }
+}
+
 tasks.register("update") {
     doLast {
         def propsFile = file("gradle.properties")
-        
+
         List<String> lines = propsFile.readLines()
 
         updateDependency(lines, "BINY", "yarn_mappings", "https://maven.glass-launcher.net/releases/net/glasslauncher/biny")
@@ -242,14 +278,14 @@ tasks.register("update") {
         updateDependency(lines, "Whats This", "whatsthis_version", "https://maven.glass-launcher.net/releases/net/danygames2014/WhatsThis")
         updateDependency(lines, "NyaLib", "nyalib_version", "https://maven.glass-launcher.cz/releases/net/danygames2014/NyaLib")
         updateDependency(lines, "UniWrench", "uniwrench_version", "https://maven.glass-launcher.cz/releases/net/danygames2014/UniWrench")
-        
+
         propsFile.text = lines.join(System.lineSeparator())
         println("Finished updating dependencies, please reload your Gradle Project")
     }
 }
 
 def updateDependency(List<String> lines, String name, String property, String artifactUrl) {
-    println("Updating Dependency " + name)
+    println("Checking updates for " + name)
 
     if (!project.hasProperty(property)) {
         println("Project does not have property " + property)
@@ -264,17 +300,17 @@ def updateDependency(List<String> lines, String name, String property, String ar
     }
 
     for (int i = 0; i < lines.size(); i++) {
-        if (lines[i].contains(property)){
+        if (lines[i].contains(property)) {
             String[] split = lines[i].split("=")
             String currentVersion = split[1]
-            
-            if (!currentVersion.equalsIgnoreCase(latestVersion)){
+
+            if (!currentVersion.equalsIgnoreCase(latestVersion)) {
                 println("Dependency " + name + " updated. (" + currentVersion + " -> " + latestVersion + ")")
                 lines[i] = split[0] + "=" + latestVersion
             } else {
                 println("Dependency " + name + " is already up to date. (" + currentVersion + ")")
             }
-            
+
             break
         }
     }
