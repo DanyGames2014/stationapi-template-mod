@@ -138,7 +138,7 @@ dependencies {
 
     if (project.hasProperty("accessoryapi_version")) {
         modImplementation("maven.modrinth:accessory-api:${project.accessoryapi_version}") {
-            transitive false
+            transitive = false
         }
     }
 
