@@ -181,6 +181,11 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 17
 }
 
+// Disables the generation of the .module file
+tasks.withType(GenerateModuleMetadata).configureEach {
+    enabled = false
+}
+
 java {
     withSourcesJar()
 }
