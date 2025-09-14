@@ -247,7 +247,9 @@ publishing {
 
 // Modrinth Publishing
 modrinth {
-    token = project.modrinth_publishing_cave
+    if (project.hasProperty("modrinth_publishing_cave")) {
+        token = project.modrinth_publishing_cave
+    }
     projectId = project.modrinth_slug
     versionNumber = project.mod_version
     versionName = "${project.modrinth_version_name} ${project.mod_version}"
