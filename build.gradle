@@ -158,6 +158,10 @@ dependencies {
         }
     }
 
+    if (project.hasProperty("debugutilities_version")) {
+        modImplementation("net.danygames2014:DebugUtilities:${project.debugutilities_version}")
+    }
+
     if (project.hasProperty("retroauth_version")) {
         modRuntimeOnly("maven.modrinth:retroauth:${project.retroauth_version}-b1.7.3") {
             transitive = false
@@ -297,6 +301,7 @@ tasks.register("update") {
         updateDependency(lines, "Whats This", "whatsthis_version", "https://maven.fildand.cz/releases/net/danygames2014/WhatsThis")
         updateDependency(lines, "NyaLib", "nyalib_version", "https://maven.fildand.cz/releases/net/danygames2014/NyaLib")
         updateDependency(lines, "UniWrench", "uniwrench_version", "https://maven.fildand.cz/releases/net/danygames2014/UniWrench")
+        updateDependency(lines, "DebugUtilities", "debugutilities_version", "https://maven.glass-launcher.net/releases/net/danygames2014/DebugUtilities")
 
         propsFile.text = lines.join(System.lineSeparator())
         println("Finished updating dependencies, please reload your Gradle Project")
