@@ -95,7 +95,7 @@ dependencies {
     }
 
     if (project.hasProperty("modmenu_version")) {
-        modImplementation("net.glasslauncher.mods:ModMenu:${project.modmenu_version}") {
+        modImplementation("net.danygames2014:modmenu:${project.modmenu_version}") {
             transitive = false
         }
     }
@@ -287,7 +287,7 @@ tasks.register("update") {
         updateDependency(lines, "Glass Networking", "glass_networking_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/glass-networking")
         updateDependency(lines, "Glass Config API", "gcapi_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/GlassConfigAPI")
         updateDependency(lines, "Always More Items", "alwaysmoreitems_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/AlwaysMoreItems")
-        updateDependency(lines, "ModMenu", "modmenu_version", "https://maven.glass-launcher.net/releases/net/glasslauncher/mods/ModMenu")
+        updateDependency(lines, "ModMenu", "modmenu_version", "https://maven.glass-launcher.net/releases/net/danygames2014/modmenu")
         updateDependency(lines, "BH Creative", "bhcreative_version", "https://api.modrinth.com/maven/maven/modrinth/bh-creative")
         updateDependency(lines, "Spawn Eggs", "spawneggs_version", "https://maven.glass-launcher.net/releases/net/danygames2014/spawneggs")
         updateDependency(lines, "Retro Commands", "retrocommands_version", "https://api.modrinth.com/maven/maven/modrinth/retrocommands")
